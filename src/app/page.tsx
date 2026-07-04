@@ -14,6 +14,7 @@ export default function Page() {
   );
   const [username, setUsername] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeDone, setWelcomeDone] = useState(true); // 默认 true，不需要等待
   const [welcomeName, setWelcomeName] = useState('');
   const [welcomeTime, setWelcomeTime] = useState('');
 
@@ -35,7 +36,8 @@ export default function Page() {
           setWelcomeName(d.gameName ?? d.username);
           setWelcomeTime(bjTime);
           setShowWelcome(true);
-          setTimeout(() => setShowWelcome(false), 2500);
+          setWelcomeDone(false);
+          setTimeout(() => { setShowWelcome(false); setWelcomeDone(true); }, 2500);
         }
 
         // 每个浏览器一个会话 id，存在 localStorage，刷新后不变
@@ -54,7 +56,7 @@ export default function Page() {
       });
   }, [router]);
 
-  if (!conversationId || initialMessages === null) {
+  if (!conversationId || initialMessages === null || !welcomeDone) {
     return (
       <div className="flex h-screen items-center justify-center" style={{ background: '#000' }}>
         {showWelcome ? (
