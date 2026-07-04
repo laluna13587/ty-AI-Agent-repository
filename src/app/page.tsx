@@ -13,6 +13,7 @@ export default function Page() {
     null,
   );
   const [username, setUsername] = useState<string | null>(null);
+  const [showWelcome, setShowWelcome] = useState(false);
 
   useEffect(() => {
     // 验证登录状态
@@ -24,6 +25,8 @@ export default function Page() {
       .then((d) => {
         if (!d) return;
         setUsername(d.username);
+        setShowWelcome(true);
+        setTimeout(() => setShowWelcome(false), 2500);
 
         // 每个浏览器一个会话 id，存在 localStorage，刷新后不变
         let id = localStorage.getItem('conversationId');
@@ -43,8 +46,24 @@ export default function Page() {
 
   if (!conversationId || initialMessages === null) {
     return (
-      <div className="flex h-screen items-center justify-center text-sm text-gray-400">
-        加载中……
+      <div className="flex h-screen items-center justify-center" style={{ background: '#000' }}>
+        {showWelcome ? (
+          <p style={{
+            fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
+            fontSize: '1.35rem',
+            fontWeight: 700,
+            background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 50%, #38b2ff 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.08em',
+            lineHeight: 2,
+            textAlign: 'center',
+          }}>
+            欢迎主公重返战场<br />天弈AI助手--「摇光」为您待命
+          </p>
+        ) : (
+          <span className="text-sm text-gray-400">加载中……</span>
+        )}
       </div>
     );
   }
