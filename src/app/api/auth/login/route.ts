@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   const { data: user } = await supabaseAdmin
     .from('users')
-    .select('id, username, password_hash, is_approved')
+    .select('id, username, password_hash, is_approved, game_name')
     .eq('username', username)
     .maybeSingle();
 
@@ -30,7 +30,7 @@ export async function POST(req: Request) {
 
   const token = signToken({ id: user.id, username: user.username });
 
-  const response = Response.json({ username: user.username });
+  const response = Response.json({ username: user.username, gameName: user.game_name ?? user.username });
   response.headers.set(
     'Set-Cookie',
     `auth_token=${token}; Path=/; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`,

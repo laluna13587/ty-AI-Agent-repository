@@ -14,6 +14,8 @@ export default function Page() {
   );
   const [username, setUsername] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState('');
+  const [welcomeTime, setWelcomeTime] = useState('');
 
   useEffect(() => {
     // 验证登录状态
@@ -25,8 +27,16 @@ export default function Page() {
       .then((d) => {
         if (!d) return;
         setUsername(d.username);
-        setShowWelcome(true);
-        setTimeout(() => setShowWelcome(false), 2500);
+        // 刚从登录页跳转过来，跳过欢迎弹窗（登录页已经弹过了）
+        if (sessionStorage.getItem('justLoggedIn')) {
+          sessionStorage.removeItem('justLoggedIn');
+        } else {
+          const bjTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+          setWelcomeName(d.gameName ?? d.username);
+          setWelcomeTime(bjTime);
+          setShowWelcome(true);
+          setTimeout(() => setShowWelcome(false), 2500);
+        }
 
         // 每个浏览器一个会话 id，存在 localStorage，刷新后不变
         let id = localStorage.getItem('conversationId');
@@ -59,6 +69,7 @@ export default function Page() {
             lineHeight: 2,
             textAlign: 'center',
           }}>
+            您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
             欢迎主公重返战场<br />天弈AI助手--「摇光」为您待命
           </p>
         ) : (

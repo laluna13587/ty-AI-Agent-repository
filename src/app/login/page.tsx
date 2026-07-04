@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [message, setMessage] = useState<{ text: string; ok: boolean } | null>(null);
   const [loading, setLoading] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  const [welcomeName, setWelcomeName] = useState('');
+  const [welcomeTime, setWelcomeTime] = useState('');
   // 注册第二步：游戏名弹窗
   const [showGameNamePrompt, setShowGameNamePrompt] = useState(false);
   const [gameName, setGameName] = useState('');
@@ -31,7 +33,11 @@ export default function LoginPage() {
       const data = await res.json();
       setLoading(false);
       if (!res.ok) { setMessage({ text: data.error ?? '操作失败', ok: false }); return; }
+      const bjTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      setWelcomeName(data.gameName ?? data.username);
+      setWelcomeTime(bjTime);
       setShowWelcome(true);
+      sessionStorage.setItem('justLoggedIn', '1');
       setTimeout(() => { router.push('/'); router.refresh(); }, 2500);
     } else {
       // 注册第一步：先收集身份标识和密钥，弹出第二步询问游戏名
@@ -89,8 +95,8 @@ export default function LoginPage() {
               WebkitTextFillColor: 'transparent',
               letterSpacing: '0.08em',
               lineHeight: 2,
-              textShadow: 'none',
             }}>
+              您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
               欢迎主公重返战场<br />天弈AI助手--「摇光」为您待命
             </p>
           </div>
