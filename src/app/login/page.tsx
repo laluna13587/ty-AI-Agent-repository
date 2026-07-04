@@ -43,9 +43,14 @@ export default function LoginPage() {
   return (
     <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
       <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-900">
-        <h1 className="mb-6 text-center text-xl font-semibold">
-          {mode === 'login' ? '登录 RAG 助手' : '注册账号'}
+        <h1 className="mb-2 text-center text-xl font-semibold">
+          {mode === 'login' ? '欢迎加入天弈团，我是天弈AI助手--「摇光」。' : '注册账号'}
         </h1>
+        {mode === 'login' && (
+          <p className="mb-6 text-center text-sm text-gray-500 dark:text-gray-400">
+            愿以星辉为引，与您共谋胜局。
+          </p>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
