@@ -105,7 +105,7 @@ export default function LoginPage() {
               最后一步
             </h2>
             <p className="mb-6 text-center text-sm" style={{ color: '#60a0c8' }}>
-              请输入您不带天弈前缀的游戏名<br />或常用称呼／名字
+              请输入您不带天弈前缀的游戏名或常用名字
             </p>
             <form onSubmit={handleGameNameSubmit} className="space-y-4">
               <input
@@ -113,7 +113,7 @@ export default function LoginPage() {
                 style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
                 value={gameName}
                 onChange={(e) => setGameName(e.target.value)}
-                placeholder="例：摇光 / 小明"
+                placeholder="例：摇光"
                 required
               />
               <button
