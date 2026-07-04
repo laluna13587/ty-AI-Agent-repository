@@ -37,7 +37,7 @@ export default function Page() {
           setWelcomeTime(bjTime);
           setShowWelcome(true);
           setWelcomeDone(false);
-          setTimeout(() => { setShowWelcome(false); setWelcomeDone(true); }, 2500);
+          setTimeout(() => { setShowWelcome(false); setWelcomeDone(true); }, 4000);
         }
 
         // 每个浏览器一个会话 id，存在 localStorage，刷新后不变

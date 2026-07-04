@@ -38,7 +38,7 @@ export default function LoginPage() {
       setWelcomeTime(bjTime);
       setShowWelcome(true);
       sessionStorage.setItem('justLoggedIn', '1');
-      setTimeout(() => { router.push('/'); router.refresh(); }, 2500);
+      setTimeout(() => { router.push('/'); router.refresh(); }, 4000);
     } else {
       // 注册第一步：先收集身份标识和密钥，弹出第二步询问游戏名
       if (username.length < 2) {
