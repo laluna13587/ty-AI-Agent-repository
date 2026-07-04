@@ -114,13 +114,23 @@ function Chat({
   }
 
   return (
-    <div className="mx-auto flex h-screen max-w-2xl flex-col p-4">
+    <div className="mx-auto flex h-screen max-w-2xl flex-col p-4" style={{ background: '#000' }}>
       <div className="mb-4 flex items-center justify-between">
-        <h1 className="text-xl font-semibold">RAG 助手</h1>
-        <div className="flex items-center gap-3 text-sm text-gray-500">
-          <span>{username}</span>
+        <h1 style={{
+          fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
+          fontSize: '1.3rem',
+          fontWeight: 700,
+          background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 40%, #c8a8ff 80%, #a8d8ff 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          letterSpacing: '0.1em',
+          textShadow: 'none',
+        }}>✦ 摇光 ✦</h1>
+        <div className="flex items-center gap-3 text-sm" style={{ color: '#406080' }}>
+          <span style={{ color: '#60a0c8' }}>{username}</span>
           <button
-            className="rounded-lg border border-gray-300 px-3 py-1 text-xs hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-800"
+            className="rounded-lg px-3 py-1 text-xs"
+            style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' });
               router.replace('/login');
@@ -132,9 +142,9 @@ function Chat({
       </div>
 
       {/* 消息列表 */}
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg border border-gray-200 p-4 dark:border-gray-700">
+      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
         {messages.length === 0 && (
-          <p className="text-sm text-gray-400">开始提问吧……</p>
+          <p className="text-sm" style={{ color: '#406080' }}>开始提问吧……</p>
         )}
 
         {messages.map((message) => (
@@ -143,11 +153,10 @@ function Chat({
             className={message.role === 'user' ? 'text-right' : 'text-left'}
           >
             <span
-              className={
-                'inline-block whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm ' +
-                (message.role === 'user'
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-900 dark:bg-gray-800 dark:text-gray-100')
+              className="inline-block whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm"
+              style={message.role === 'user'
+                ? { background: 'rgba(20,60,120,0.9)', color: '#c8e8ff', border: '1px solid rgba(80,180,255,0.3)' }
+                : { background: 'rgba(15,30,55,0.9)', color: '#b0d4f0', border: '1px solid rgba(60,120,200,0.2)' }
               }
             >
               {message.parts.map((part, i) =>
@@ -158,14 +167,15 @@ function Chat({
         ))}
 
         {status === 'submitted' && (
-          <p className="text-sm text-gray-400">思考中……</p>
+          <p className="text-sm" style={{ color: '#406080' }}>思考中……</p>
         )}
       </div>
 
       {/* 输入框 */}
       <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
         <input
-          className="flex-1 rounded-lg border border-gray-300 px-4 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-600 dark:bg-gray-900"
+          className="flex-1 rounded-lg px-4 py-2 text-sm outline-none"
+          style={{ background: 'rgba(10,25,50,0.9)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
           value={input}
           placeholder="输入消息，回车发送"
           onChange={(e) => setInput(e.target.value)}
@@ -174,7 +184,8 @@ function Chat({
         <button
           type="submit"
           disabled={isBusy || !input.trim()}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-medium text-white disabled:opacity-40"
+          className="rounded-lg px-5 py-2 text-sm font-medium disabled:opacity-40"
+          style={{ background: 'linear-gradient(135deg, #1a6090, #0a4070)', color: '#a8d8ff', border: '1px solid rgba(80,180,255,0.4)' }}
         >
           发送
         </button>
