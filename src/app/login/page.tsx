@@ -41,22 +41,25 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex h-screen items-center justify-center bg-gray-50 dark:bg-gray-950">
-      <div className="w-full max-w-sm rounded-2xl border border-gray-200 bg-white p-8 shadow-sm dark:border-gray-700 dark:bg-gray-900">
-        <h1 className="mb-2 text-center text-xl font-semibold">
-          {mode === 'login' ? '欢迎加入天弈团，我是天弈AI助手--「摇光」。' : '注册账号'}
+    <div className="flex h-screen items-center justify-center" style={{ background: '#000' }}>
+      <div className="w-full max-w-sm rounded-2xl p-8" style={{ background: 'rgba(10,20,40,0.95)', border: '1px solid rgba(100,200,255,0.2)', boxShadow: '0 0 40px rgba(80,180,255,0.15)' }}>
+        <h1 className="mb-2 text-center" style={{ fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif', fontSize: '1.25rem', fontWeight: 700, background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 50%, #38b2ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: 'none', letterSpacing: '0.05em' }}>
+          {mode === 'login' ? (
+            <>欢迎加入天弈团，<br />我是天弈AI助手--「摇光」。</>
+          ) : <span style={{ WebkitTextFillColor: '#a8d8ff' }}>注册账号</span>}
         </h1>
         {mode === 'login' && (
-          <p className="mb-6 text-center text-sm text-gray-500 dark:text-gray-400">
+          <p className="mb-6 text-center text-sm" style={{ color: '#60a0c8', fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif', letterSpacing: '0.05em' }}>
             愿以星辉为引，与您共谋胜局。
           </p>
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">用户名</label>
+            <label className="mb-1 block text-sm" style={{ color: '#60a0c8' }}>用户名</label>
             <input
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+              style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               autoComplete="username"
@@ -64,10 +67,11 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="mb-1 block text-sm text-gray-600 dark:text-gray-400">密码</label>
+            <label className="mb-1 block text-sm" style={{ color: '#60a0c8' }}>密码</label>
             <input
               type="password"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-600 dark:bg-gray-800"
+              className="w-full rounded-lg px-3 py-2 text-sm outline-none"
+              style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
@@ -76,7 +80,7 @@ export default function LoginPage() {
           </div>
 
           {message && (
-            <p className={`text-sm ${message.ok ? 'text-green-600' : 'text-red-500'}`}>
+            <p className={`text-sm ${message.ok ? 'text-green-400' : 'text-red-400'}`}>
               {message.text}
             </p>
           )}
@@ -84,24 +88,25 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 py-2 text-sm font-medium text-white disabled:opacity-40"
+            className="w-full rounded-lg py-2 text-sm font-medium disabled:opacity-40"
+            style={{ background: 'linear-gradient(135deg, #1a6090, #0a4070)', color: '#a8d8ff', border: '1px solid rgba(80,180,255,0.4)' }}
           >
             {loading ? '处理中…' : mode === 'login' ? '登录' : '注册'}
           </button>
         </form>
 
-        <p className="mt-4 text-center text-sm text-gray-500">
+        <p className="mt-4 text-center text-sm" style={{ color: '#406080' }}>
           {mode === 'login' ? (
             <>
               没有账号？{' '}
-              <button className="text-blue-600 hover:underline" onClick={() => { setMode('register'); setMessage(null); }}>
+              <button style={{ color: '#60c8ff' }} className="hover:underline" onClick={() => { setMode('register'); setMessage(null); }}>
                 注册
               </button>
             </>
           ) : (
             <>
               已有账号？{' '}
-              <button className="text-blue-600 hover:underline" onClick={() => { setMode('login'); setMessage(null); }}>
+              <button style={{ color: '#60c8ff' }} className="hover:underline" onClick={() => { setMode('login'); setMessage(null); }}>
                 登录
               </button>
             </>
