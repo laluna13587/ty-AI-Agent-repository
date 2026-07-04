@@ -97,7 +97,7 @@ export default function LoginPage() {
               lineHeight: 2,
             }}>
               您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-              欢迎主公重返战场<br />天弈AI助手--「摇光」为您待命
+              欢迎主公重返战场<br />天弈AI战场支援--「摇光」为您待命
             </p>
           </div>
         </div>
