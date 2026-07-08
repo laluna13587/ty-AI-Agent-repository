@@ -10,7 +10,13 @@ export type Match = {
 
 // 给一句话，返回知识库里最相关的 k 段
 export async function retrieve(query: string, k = 5): Promise<Match[]> {
-  const embedding = await embedQuery(query);
+  let embedding: number[];
+  try {
+    embedding = await embedQuery(query);
+  } catch (e) {
+    console.error('向量化失败，跳过 RAG 检索:', e);
+    return [];
+  }
 
   const { data, error } = await supabaseAdmin.rpc('match_documents', {
     query_embedding: embedding,
