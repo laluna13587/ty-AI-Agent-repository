@@ -48,11 +48,12 @@ export default function Page() {
         }
         setConversationId(id);
 
-        // 拉取这条会话的历史消息
+        // 拉取这条会话的历史消息（5秒超时兜底）
+        const historyTimeout = setTimeout(() => setInitialMessages([]), 5000);
         fetch(`/api/history?conversationId=${id}`)
           .then((r) => r.json())
-          .then((d) => setInitialMessages(d.messages ?? []))
-          .catch(() => setInitialMessages([]));
+          .then((d) => { clearTimeout(historyTimeout); setInitialMessages(d.messages ?? []); })
+          .catch(() => { clearTimeout(historyTimeout); setInitialMessages([]); });
       });
   }, [router]);
 
