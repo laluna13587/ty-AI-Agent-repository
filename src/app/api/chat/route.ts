@@ -1,4 +1,9 @@
-import { anthropic } from '@ai-sdk/anthropic';
+import { createOpenAI } from '@ai-sdk/openai';
+
+const deepseek = createOpenAI({
+  apiKey: process.env.DEEPSEEK_API_KEY ?? '',
+  baseURL: 'https://api.deepseek.com/v1',
+});
 import {
   streamText,
   convertToModelMessages,
@@ -62,12 +67,7 @@ export async function POST(req: Request) {
     : `你是一个中文智能助手。回答准确、简洁。（当前知识库为空或未检索到相关资料。）`;
 
   const result = streamText({
-    // 想换模型只改这一行：
-    //   claude-sonnet-4-6  质量好（默认）
-    //   claude-haiku-4-5   更便宜更快
-    //   claude-opus-4-8    最强、最贵
-    // 将来换 OpenAI/DeepSeek：装对应 provider 包，把 anthropic(...) 换成 openai(...) 即可
-    model: anthropic('claude-sonnet-4-6'),
+    model: deepseek('deepseek-chat'),
     system: systemPrompt,
     messages: await convertToModelMessages(messages),
     // AI 回答完整生成后，把它存进数据库
