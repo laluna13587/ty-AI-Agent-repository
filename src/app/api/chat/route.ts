@@ -60,6 +60,7 @@ export async function POST(req: Request) {
   // 保存用户刚发的这条消息（messages 数组最后一条）
   const lastUser = messages[messages.length - 1];
   const question = lastUser?.role === 'user' ? textOf(lastUser) : '';
+  console.log(`[chat] user=${user.username} question="${question.slice(0, 50)}"`);
   if (question) {
     await supabaseAdmin.from('messages').insert({
       conversation_id: conversationId,

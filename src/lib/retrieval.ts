@@ -13,6 +13,7 @@ export async function retrieve(query: string, k = 5): Promise<Match[]> {
   let embedding: number[];
   try {
     embedding = await embedQuery(query);
+    console.log(`[retrieval] embedding OK, querying Supabase`);
   } catch (e) {
     console.error('向量化失败，跳过 RAG 检索:', e);
     return [];
