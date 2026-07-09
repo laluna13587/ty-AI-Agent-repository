@@ -1,9 +1,4 @@
-import { createOpenAI } from '@ai-sdk/openai';
-
-const deepseek = createOpenAI({
-  apiKey: process.env.DEEPSEEK_API_KEY ?? '',
-  baseURL: 'https://api.deepseek.com/v1',
-});
+import { deepseek } from '@ai-sdk/deepseek';
 import {
   streamText,
   convertToModelMessages,
