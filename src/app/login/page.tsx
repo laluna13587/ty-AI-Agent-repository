@@ -175,12 +175,15 @@ export default function LoginPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="mb-1 block text-sm" style={{ color: '#60a0c8' }}>成员身份标识</label>
+            {mode === 'register' && (
+              <p className="mb-1 text-xs" style={{ color: '#4a7a9b' }}>请填写您的微信号，将作为您在系统中的唯一身份标识</p>
+            )}
             <input
               className="w-full rounded-lg px-3 py-2 text-sm outline-none"
               style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder={mode === 'register' ? '请填写您的微信号，将作为您在系统中的唯一身份标识' : ''}
+              placeholder={mode === 'register' ? '请输入微信号' : ''}
               autoComplete="username"
               required
             />
@@ -188,7 +191,7 @@ export default function LoginPage() {
           <div>
             <label className="mb-1 block text-sm" style={{ color: '#60a0c8' }}>通行密钥</label>
             {mode === 'register' && (
-              <p className="mb-1 text-xs" style={{ color: '#4a7a9b' }}>请设置您的登录密码，密码仅用于身份验证，如需修改可联系管理员</p>
+              <p className="mb-1 text-xs" style={{ color: '#4a7a9b' }}>密码仅用于身份验证，如需修改可联系管理员</p>
             )}
             <input
               type="password"
@@ -196,6 +199,7 @@ export default function LoginPage() {
               style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              placeholder={mode === 'register' ? '请设置新密码' : ''}
               autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
               required
             />
