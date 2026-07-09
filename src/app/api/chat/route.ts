@@ -32,10 +32,30 @@ export async function POST(req: Request) {
     conversationId: string;
   } = await req.json();
 
-  // 确保这条会话存在（客户端生成 id，这里没有就建一条）
+  // 限流：每用户每天最多 20 条用户消息
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+  const { data: userConvs } = await supabaseAdmin
+    .from('conversations')
+    .select('id')
+    .eq('user_id', user.id);
+  const convIds = (userConvs ?? []).map((c) => c.id);
+  if (convIds.length > 0) {
+    const { count } = await supabaseAdmin
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'user')
+      .in('conversation_id', convIds)
+      .gte('created_at', todayStart.toISOString());
+    if ((count ?? 0) >= 20) {
+      return Response.json({ error: '今日提问次数已达上限（20次），请明天再来' }, { status: 429 });
+    }
+  }
+
+  // 确保这条会话存在，并关联 user_id
   await supabaseAdmin
     .from('conversations')
-    .upsert({ id: conversationId }, { onConflict: 'id' });
+    .upsert({ id: conversationId, user_id: user.id }, { onConflict: 'id' });
 
   // 保存用户刚发的这条消息（messages 数组最后一条）
   const lastUser = messages[messages.length - 1];
