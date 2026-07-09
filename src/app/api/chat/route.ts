@@ -32,20 +32,29 @@ export async function POST(req: Request) {
     conversationId: string;
   } = await req.json();
 
-  // 限流：每用户每天最多 20 条用户消息（直接通过 conversations 关联查询，避免两次 DB 请求）
-  const todayStart = new Date();
-  todayStart.setHours(0, 0, 0, 0);
-  const { count: todayCount } = await supabaseAdmin
-    .from('messages')
-    .select('id', { count: 'exact', head: true })
-    .eq('role', 'user')
-    .gte('created_at', todayStart.toISOString())
-    .in(
-      'conversation_id',
-      supabaseAdmin.from('conversations').select('id').eq('user_id', user.id),
-    );
-  if ((todayCount ?? 0) >= 10) {
-    return Response.json({ error: '今日提问次数已达上限（10次），请明天再来' }, { status: 429 });
+  // 检查是否豁免每日限流
+  const { data: userRow } = await supabaseAdmin
+    .from('users')
+    .select('is_rate_exempt')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  if (!userRow?.is_rate_exempt) {
+    // 限流：每用户每天最多 10 条用户消息
+    const todayStart = new Date();
+    todayStart.setHours(0, 0, 0, 0);
+    const { count: todayCount } = await supabaseAdmin
+      .from('messages')
+      .select('id', { count: 'exact', head: true })
+      .eq('role', 'user')
+      .gte('created_at', todayStart.toISOString())
+      .in(
+        'conversation_id',
+        supabaseAdmin.from('conversations').select('id').eq('user_id', user.id),
+      );
+    if ((todayCount ?? 0) >= 10) {
+      return Response.json({ error: '今日提问次数已达上限（10次），请明天再来' }, { status: 429 });
+    }
   }
 
   // 确保这条会话存在，并关联 user_id

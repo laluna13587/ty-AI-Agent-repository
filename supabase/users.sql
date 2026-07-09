@@ -19,3 +19,11 @@ alter table conversations add column if not exists user_id uuid references users
 -- 在 Supabase 后台 Table Editor 直接将 is_approved 改为 true
 -- 或执行：
 --   update users set is_approved = true where username = '你要审批的用户名';
+
+-- ===== 每日限流豁免字段（新增，需在 Supabase 执行） =====
+alter table users add column if not exists is_rate_exempt boolean not null default false;
+
+-- 给某账户开豁免：
+--   update users set is_rate_exempt = true where username = '要豁免的用户名';
+-- 取消豁免：
+--   update users set is_rate_exempt = false where username = '要取消的用户名';
