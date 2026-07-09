@@ -111,12 +111,25 @@ function Chat({
 
   const isBusy = status === 'submitted' || status === 'streaming';
 
+  const [isComposing, setIsComposing] = useState(false);
+
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (isComposing) return;
     const text = input.trim();
     if (!text || isBusy) return;
     sendMessage({ text });
     setInput('');
+  }
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === 'Enter' && !e.shiftKey && !isComposing) {
+      e.preventDefault();
+      const text = input.trim();
+      if (!text || isBusy) return;
+      sendMessage({ text });
+      setInput('');
+    }
   }
 
   return (
@@ -185,6 +198,9 @@ function Chat({
           value={input}
           placeholder="输入消息，回车发送"
           onChange={(e) => setInput(e.target.value)}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          onKeyDown={handleKeyDown}
           disabled={isBusy}
         />
         <button
