@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -18,6 +18,19 @@ export default function LoginPage() {
   const [gameName, setGameName] = useState('');
   const [pendingUsername, setPendingUsername] = useState('');
   const [pendingPassword, setPendingPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('savedCredentials');
+      if (saved) {
+        const { u, p } = JSON.parse(saved);
+        setUsername(u ?? '');
+        setPassword(atob(p ?? ''));
+        setRememberMe(true);
+      }
+    } catch { /* 忽略损坏的缓存 */ }
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -33,6 +46,11 @@ export default function LoginPage() {
       const data = await res.json();
       setLoading(false);
       if (!res.ok) { setMessage({ text: data.error ?? '操作失败', ok: false }); return; }
+      if (rememberMe) {
+        localStorage.setItem('savedCredentials', JSON.stringify({ u: username, p: btoa(password) }));
+      } else {
+        localStorage.removeItem('savedCredentials');
+      }
       const bjTime = new Date().toLocaleString('zh-CN', { timeZone: 'Asia/Shanghai', hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
       setWelcomeName(data.gameName ?? data.username);
       setWelcomeTime(bjTime);
@@ -179,6 +197,19 @@ export default function LoginPage() {
             <p className={`text-sm ${message.ok ? 'text-green-400' : 'text-red-400'}`}>
               {message.text}
             </p>
+          )}
+
+          {mode === 'login' && (
+            <label className="flex items-center gap-2 cursor-pointer select-none" style={{ color: '#60a0c8' }}>
+              <input
+                type="checkbox"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="rounded"
+                style={{ accentColor: '#60c8ff' }}
+              />
+              <span className="text-xs">记住账号密码</span>
+            </label>
           )}
 
           <button
