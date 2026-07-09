@@ -137,7 +137,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-2xl p-8" style={{ background: 'rgba(10,20,40,0.95)', border: '1px solid rgba(100,200,255,0.2)', boxShadow: '0 0 40px rgba(80,180,255,0.15)' }}>
         <h1 className="mb-2 text-center" style={{ fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif', fontSize: '1.25rem', fontWeight: 700, background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 50%, #38b2ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: 'none', letterSpacing: '0.05em' }}>
           {mode === 'login' ? (
-            <>欢迎加入扶摇团<br />我是扶摇AI助手--「摇光」</>
+            <>欢迎加入扶摇团<br />我是天弈/扶摇AI战场支援--「摇光」</>
           ) : <span style={{ WebkitTextFillColor: '#a8d8ff' }}>注册账号</span>}
         </h1>
         {mode === 'login' && (
