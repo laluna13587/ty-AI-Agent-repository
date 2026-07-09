@@ -395,7 +395,7 @@ function Chat({
           </div>
         ))}
 
-        <ProcessSteps status={status} />
+        {isBusy && <ProcessSteps status={status} />}
       </div>
 
       {/* 输入框 */}
