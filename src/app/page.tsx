@@ -300,8 +300,8 @@ export default function Page() {
             lineHeight: 2,
             textAlign: 'center',
           }}>
-            您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-            欢迎回来，【{welcomeName}】。
+            欢迎回来，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
+            欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
           </p>
         ) : (
           <span className="text-sm text-gray-400">加载中……</span>
@@ -371,7 +371,7 @@ function Chat({
           WebkitTextFillColor: 'transparent',
           letterSpacing: '0.1em',
           textShadow: 'none',
-        }}>✦ 摇光 ✦</h1>
+        }} className="breathe-title">✦ 摇光 ✦</h1>
         <div className="flex items-center gap-3 text-sm" style={{ color: '#406080' }}>
           <div className="text-right" style={{ lineHeight: 1.5 }}>
             <div style={{ fontSize: '0.6rem', color: '#2a5070', fontFamily: 'monospace', letterSpacing: '0.08em' }}>已认证身份</div>

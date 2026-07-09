@@ -65,6 +65,15 @@ body {
   box-shadow: 0 0 8px rgba(80,180,255,0.3);
 }
 
+@keyframes breathe-title {
+  0%, 100% { opacity: 0.65; filter: brightness(0.8) drop-shadow(0 0 4px rgba(200,168,64,0.2)); }
+  50%       { opacity: 1;    filter: brightness(1.25) drop-shadow(0 0 10px rgba(200,168,64,0.55)); }
+}
+
+.breathe-title {
+  animation: breathe-title 3s ease-in-out infinite;
+}
+
 .btn-ghost {
   transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s, box-shadow 0.15s;
 }
