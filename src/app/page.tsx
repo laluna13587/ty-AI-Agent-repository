@@ -404,8 +404,6 @@ function Chat({
 
       {/* 消息列表 */}
       <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
-      {/* 消息列表 */}
-      <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
         {messages.length === 0 && !isBusy && <EmptyGreeting gameName={gameName} />}
 
         {/* 流式输出时：隐藏最后一条助手消息，让它在 ProcessSteps 之后渲染 */}
