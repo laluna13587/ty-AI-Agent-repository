@@ -187,7 +187,7 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
       <div style={{ fontSize: '0.68rem', color: '#3a2800', fontFamily: 'monospace', letterSpacing: '0.18em',
         background: 'linear-gradient(90deg, #8a6820, #c8a040, #8a6820)',
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
-        YAOGUANG · COMBAT SUPPORT SYSTEM · ONLINE
+        YAOGUANG · AI SUPPORT SYSTEM · ONLINE
       </div>
       <div style={{
         fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
@@ -274,7 +274,7 @@ export default function Page() {
             clearTimeout(historyTimeout);
             const msgs: UIMessage[] = d.messages ?? [];
             // 存储最后一条消息摘要，供下次新对话"上次通讯"展示
-            const last = [...msgs].reverse().find(m => m.role === 'assistant' || m.role === 'user');
+            const last = [...msgs].reverse().find(m => m.role === 'user');
             if (last) {
               const text = (last.parts ?? []).map((p: { type: string; text?: string }) => p.type === 'text' ? p.text ?? '' : '').join('').trim();
               if (text) localStorage.setItem('lastMessageSummary', text.slice(0, 15));

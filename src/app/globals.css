@@ -46,7 +46,7 @@ body {
 }
 
 .breathe-border {
-  animation: breathe 5s ease-in-out infinite;
+  animation: breathe 8s ease-in-out infinite;
 }
 
 .fade-in-up {
