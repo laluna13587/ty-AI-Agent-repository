@@ -4,6 +4,7 @@ import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage } from 'ai';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import ReactMarkdown from 'react-markdown';
 
 // 外层：先拿到 conversationId + 历史消息，再挂载真正的聊天组件
 export default function Page() {
@@ -172,14 +173,20 @@ function Chat({
             className={message.role === 'user' ? 'text-right' : 'text-left'}
           >
             <span
-              className="inline-block whitespace-pre-wrap rounded-2xl px-4 py-2 text-sm"
+              className={`inline-block rounded-2xl px-4 py-2 text-sm${
+                message.role === 'user' ? ' whitespace-pre-wrap' : ''
+              }`}
               style={message.role === 'user'
                 ? { background: 'rgba(20,60,120,0.9)', color: '#c8e8ff', border: '1px solid rgba(80,180,255,0.3)' }
                 : { background: 'rgba(15,30,55,0.9)', color: '#b0d4f0', border: '1px solid rgba(60,120,200,0.2)' }
               }
             >
               {message.parts.map((part, i) =>
-                part.type === 'text' ? <span key={i}>{part.text}</span> : null,
+                part.type === 'text'
+                  ? message.role === 'assistant'
+                    ? <ReactMarkdown key={i}>{part.text}</ReactMarkdown>
+                    : <span key={i}>{part.text}</span>
+                  : null,
               )}
             </span>
           </div>

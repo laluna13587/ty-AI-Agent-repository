@@ -32,24 +32,20 @@ export async function POST(req: Request) {
     conversationId: string;
   } = await req.json();
 
-  // 限流：每用户每天最多 20 条用户消息
+  // 限流：每用户每天最多 20 条用户消息（直接通过 conversations 关联查询，避免两次 DB 请求）
   const todayStart = new Date();
   todayStart.setHours(0, 0, 0, 0);
-  const { data: userConvs } = await supabaseAdmin
-    .from('conversations')
-    .select('id')
-    .eq('user_id', user.id);
-  const convIds = (userConvs ?? []).map((c) => c.id);
-  if (convIds.length > 0) {
-    const { count } = await supabaseAdmin
-      .from('messages')
-      .select('id', { count: 'exact', head: true })
-      .eq('role', 'user')
-      .in('conversation_id', convIds)
-      .gte('created_at', todayStart.toISOString());
-    if ((count ?? 0) >= 20) {
-      return Response.json({ error: '今日提问次数已达上限（20次），请明天再来' }, { status: 429 });
-    }
+  const { count: todayCount } = await supabaseAdmin
+    .from('messages')
+    .select('id', { count: 'exact', head: true })
+    .eq('role', 'user')
+    .gte('created_at', todayStart.toISOString())
+    .in(
+      'conversation_id',
+      supabaseAdmin.from('conversations').select('id').eq('user_id', user.id),
+    );
+  if ((todayCount ?? 0) >= 10) {
+    return Response.json({ error: '今日提问次数已达上限（10次），请明天再来' }, { status: 429 });
   }
 
   // 确保这条会话存在，并关联 user_id
@@ -59,15 +55,30 @@ export async function POST(req: Request) {
 
   // 保存用户刚发的这条消息（messages 数组最后一条）
   const lastUser = messages[messages.length - 1];
-  const question = lastUser?.role === 'user' ? textOf(lastUser) : '';
+  const question = (lastUser?.role === 'user' ? textOf(lastUser) : '').trim();
   console.log(`[chat] user=${user.username} question="${question.slice(0, 50)}"`);
-  if (question) {
-    await supabaseAdmin.from('messages').insert({
-      conversation_id: conversationId,
-      role: 'user',
-      content: question,
-    });
+  if (!question) {
+    return Response.json({ error: '消息不能为空' }, { status: 400 });
   }
+  await supabaseAdmin.from('messages').insert({
+    conversation_id: conversationId,
+    role: 'user',
+    content: question,
+  });
+
+  // 从数据库加载最近 4 条历史（不含刚存入的这条），拼上当前问题作为模型上下文
+  const { data: historyRows } = await supabaseAdmin
+    .from('messages')
+    .select('role, content')
+    .eq('conversation_id', conversationId)
+    .order('created_at', { ascending: false })
+    .limit(5);
+  const historyMessages = ((historyRows ?? []).reverse() as { role: string; content: string }[])
+    .map((m) => ({
+      id: String(Math.random()),
+      role: m.role as 'user' | 'assistant',
+      parts: [{ type: 'text' as const, text: m.content }],
+    }));
 
   // 🔍 RAG：用问题去知识库检索最相关的几段
   const matches = question ? await retrieve(question, 5) : [];
@@ -86,7 +97,7 @@ export async function POST(req: Request) {
   const result = streamText({
     model: deepseek('deepseek-chat'),
     system: systemPrompt,
-    messages: await convertToModelMessages(messages),
+    messages: await convertToModelMessages(historyMessages),
     // AI 回答完整生成后，把它存进数据库
     onEnd: async ({ text }) => {
       await supabaseAdmin.from('messages').insert({
