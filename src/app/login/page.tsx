@@ -103,16 +103,24 @@ export default function LoginPage() {
       {/* 登录成功欢迎消息 */}
       {showWelcome && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.92)' }}>
-          <div className="text-center px-8">
+          <div className="text-center px-10 py-10 rounded-2xl" style={{
+            background: 'linear-gradient(160deg, rgba(8,20,45,0.98) 0%, rgba(5,12,30,0.98) 100%)',
+            border: '1px solid rgba(80,180,255,0.35)',
+            boxShadow: '0 0 60px rgba(60,140,255,0.25), 0 0 120px rgba(40,100,200,0.12), inset 0 1px 0 rgba(120,200,255,0.1)',
+            backdropFilter: 'blur(12px)',
+            transform: 'perspective(800px) rotateX(1deg)',
+            maxWidth: '88vw',
+          }}>
+            <div style={{ fontSize: '0.62rem', color: '#2a5878', fontFamily: 'monospace', letterSpacing: '0.2em', marginBottom: '1.2rem' }}>IDENTITY VERIFIED · SYSTEM ONLINE</div>
             <p style={{
               fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
-              fontSize: '1.35rem',
+              fontSize: '1.25rem',
               fontWeight: 700,
               background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 50%, #38b2ff 100%)',
               WebkitBackgroundClip: 'text',
               WebkitTextFillColor: 'transparent',
               letterSpacing: '0.08em',
-              lineHeight: 2,
+              lineHeight: 2.2,
             }}>
               欢迎回来，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
               欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
