@@ -2,9 +2,113 @@
 
 import { useChat } from '@ai-sdk/react';
 import { DefaultChatTransport, type UIMessage } from 'ai';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
+
+// ── 进程步骤组件 ──────────────────────────────────────────
+function ProcessSteps({ status }: { status: string }) {
+  const [steps, setSteps] = useState<{ label: string; time: string }[]>([]);
+  const initialized = useRef(false);
+  const timersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const prevStatus = useRef(status);
+
+  const nowStr = () =>
+    new Date().toLocaleTimeString('zh-CN', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+  useEffect(() => {
+    if (status === 'idle' || status === 'error') {
+      initialized.current = false;
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+      return;
+    }
+    if (initialized.current) return;
+    initialized.current = true;
+
+    setSteps([{ label: '接收任务', time: nowStr() }]);
+    timersRef.current = [
+      setTimeout(() => setSteps(s => [...s, { label: '摇光正在检索知识星图', time: nowStr() }]), 520),
+      setTimeout(() => setSteps(s => [...s, { label: '摇光正在推演最优解', time: nowStr() }]), 1250),
+    ];
+    return () => timersRef.current.forEach(clearTimeout);
+  }, [status]);
+
+  useEffect(() => {
+    if (prevStatus.current !== 'streaming' && status === 'streaming') {
+      setSteps(s => [...s, { label: '摇光已完成分析，正在输出', time: nowStr() }]);
+    }
+    prevStatus.current = status;
+  }, [status]);
+
+  if (steps.length === 0) return null;
+
+  return (
+    <div className="text-left py-2 space-y-1 pl-1">
+      {steps.map((step, i) => (
+        <div key={i} className="fade-in-up flex items-center gap-2"
+          style={{ fontSize: '0.72rem', fontFamily: 'monospace', animationDelay: `${i * 0.05}s` }}>
+          <span style={{ color: '#38c87a' }}>✓</span>
+          <span style={{ color: '#2a4858' }}>[{step.time}]</span>
+          <span style={{ color: i === steps.length - 1 ? '#70c8b0' : '#456878' }}>{step.label}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── 空状态问候组件 ─────────────────────────────────────────
+function EmptyGreeting({ username }: { username: string }) {
+  const hour = new Date().getHours();
+  const bjDate = new Date().toLocaleDateString('zh-CN', {
+    timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long',
+  });
+
+  let timeLabel: string, message: string;
+  if (hour >= 5 && hour < 9) {
+    timeLabel = '晨间好';
+    message = '新的一天已经开始，战场等待您的部署。';
+  } else if (hour >= 9 && hour < 12) {
+    timeLabel = '上午好';
+    message = '上午是进攻的黄金时段，需要制定方案吗？';
+  } else if (hour >= 12 && hour < 14) {
+    timeLabel = '午间好';
+    message = '午时小憩，或趁此复盘今日战况？';
+  } else if (hour >= 14 && hour < 18) {
+    timeLabel = '下午好';
+    message = '下午是部署长线策略的好时机。';
+  } else if (hour >= 18 && hour < 21) {
+    timeLabel = '傍晚好';
+    message = '夜间攻势将至，您的部队是否已就位？';
+  } else if (hour >= 21 && hour < 24) {
+    timeLabel = '晚上好';
+    message = '深夜仍在运筹，摇光随时待命。';
+  } else {
+    timeLabel = '夜深了';
+    message = '凌晨时分，摇光依然在线。';
+  }
+
+  return (
+    <div className="flex flex-col items-center justify-center h-full gap-5 px-4 text-center">
+      <div style={{ fontSize: '0.68rem', color: '#1e3040', fontFamily: 'monospace', letterSpacing: '0.18em' }}>
+        YAOGUANG · COMBAT SUPPORT SYSTEM · ONLINE
+      </div>
+      <div style={{
+        fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
+        fontSize: '0.95rem', lineHeight: 2.2, letterSpacing: '0.08em',
+        background: 'linear-gradient(135deg, #7ab8d8 0%, #50a8c8 50%, #88c8b8 100%)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
+      }}>
+        {timeLabel}，「{username}」<br />
+        {bjDate}<br />
+        {message}
+      </div>
+      <div style={{ fontSize: '0.68rem', color: '#1e3848', fontFamily: 'monospace', letterSpacing: '0.12em' }}>
+        ▸ 请下达指令
+      </div>
+    </div>
+  );
+}
 
 // 外层：先拿到 conversationId + 历史消息，再挂载真正的聊天组件
 export default function Page() {
@@ -176,15 +280,13 @@ function Chat({
       </div>
 
       {/* 消息列表 */}
-      <div className="flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
-        {messages.length === 0 && (
-          <p className="text-sm" style={{ color: '#406080' }}>开始提问吧……</p>
-        )}
+      <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
+        {messages.length === 0 && !isBusy && <EmptyGreeting username={username} />}
 
         {messages.map((message) => (
           <div
             key={message.id}
-            className={message.role === 'user' ? 'text-right' : 'text-left'}
+            className={`fade-in-up ${message.role === 'user' ? 'text-right' : 'text-left'}`}
           >
             <span
               className={`inline-block rounded-2xl px-4 py-2 text-sm${
@@ -206,9 +308,7 @@ function Chat({
           </div>
         ))}
 
-        {status === 'submitted' && (
-          <p className="text-sm" style={{ color: '#406080' }}>思考中……</p>
-        )}
+        <ProcessSteps status={status} />
       </div>
 
       {/* 输入框 */}
