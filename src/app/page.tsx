@@ -366,7 +366,7 @@ function Chat({
           fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
           fontSize: '1.3rem',
           fontWeight: 700,
-          background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 30%, #c8a840 60%, #e8c860 80%, #a8d8ff 100%)',
+          background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 40%, #c8a8ff 80%, #a8d8ff 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           letterSpacing: '0.1em',
