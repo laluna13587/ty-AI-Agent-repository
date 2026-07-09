@@ -354,6 +354,7 @@ function Chat({
     if (isComposing) return;
     const text = input.trim();
     if (!text || isBusy) return;
+    localStorage.setItem('lastMessageSummary', text.slice(0, 15));
     sendMessage({ text });
     setInput('');
   }
@@ -363,6 +364,7 @@ function Chat({
       e.preventDefault();
       const text = input.trim();
       if (!text || isBusy) return;
+      localStorage.setItem('lastMessageSummary', text.slice(0, 15));
       sendMessage({ text });
       setInput('');
     }
@@ -402,34 +404,49 @@ function Chat({
 
       {/* 消息列表 */}
       <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
+      {/* 消息列表 */}
+      <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
         {messages.length === 0 && !isBusy && <EmptyGreeting gameName={gameName} />}
 
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`fade-in-up ${message.role === 'user' ? 'text-right' : 'text-left'}`}
-          >
-            <span
-              className={`inline-block rounded-2xl px-4 py-2 text-sm${
-                message.role === 'user' ? ' whitespace-pre-wrap' : ''
-              }`}
-              style={message.role === 'user'
-                ? { background: 'rgba(20,60,120,0.9)', color: '#c8e8ff', border: '1px solid rgba(80,180,255,0.3)' }
-                : { background: 'rgba(15,30,55,0.9)', color: '#b0d4f0', border: '1px solid rgba(60,120,200,0.2)' }
-              }
-            >
-              {message.parts.map((part, i) =>
-                part.type === 'text'
-                  ? message.role === 'assistant'
-                    ? <ReactMarkdown key={i}>{part.text}</ReactMarkdown>
-                    : <span key={i}>{part.text}</span>
-                  : null,
-              )}
-            </span>
-          </div>
-        ))}
+        {/* 流式输出时：隐藏最后一条助手消息，让它在 ProcessSteps 之后渲染 */}
+        {(() => {
+          const streamingLast = isBusy && messages.length > 0 && messages[messages.length - 1].role === 'assistant';
+          const visibleMessages = streamingLast ? messages.slice(0, -1) : messages;
+          const streamingMsg = streamingLast ? messages[messages.length - 1] : null;
 
-        {isBusy && <ProcessSteps status={status} />}
+          const renderBubble = (message: typeof messages[0]) => (
+            <div
+              key={message.id}
+              className={`fade-in-up ${message.role === 'user' ? 'text-right' : 'text-left'}`}
+            >
+              <span
+                className={`inline-block rounded-2xl px-4 py-2 text-sm${
+                  message.role === 'user' ? ' whitespace-pre-wrap' : ''
+                }`}
+                style={message.role === 'user'
+                  ? { background: 'rgba(20,60,120,0.9)', color: '#c8e8ff', border: '1px solid rgba(80,180,255,0.3)' }
+                  : { background: 'rgba(15,30,55,0.9)', color: '#b0d4f0', border: '1px solid rgba(60,120,200,0.2)' }
+                }
+              >
+                {message.parts.map((part, i) =>
+                  part.type === 'text'
+                    ? message.role === 'assistant'
+                      ? <ReactMarkdown key={i}>{part.text}</ReactMarkdown>
+                      : <span key={i}>{part.text}</span>
+                    : null,
+                )}
+              </span>
+            </div>
+          );
+
+          return (
+            <>
+              {visibleMessages.map(renderBubble)}
+              {isBusy && <ProcessSteps status={status} />}
+              {streamingMsg && renderBubble(streamingMsg)}
+            </>
+          );
+        })()}
       </div>
 
       {/* 输入框 */}

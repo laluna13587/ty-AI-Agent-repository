@@ -71,7 +71,7 @@ body {
 }
 
 .breathe-title {
-  animation: breathe-title 3s ease-in-out infinite;
+  animation: breathe-title 8s ease-in-out infinite;
 }
 
 .btn-ghost {
