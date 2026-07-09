@@ -30,7 +30,7 @@ function ProcessSteps({ status }: { status: string }) {
 
     setSteps([{ label: '接收任务', time: nowStr() }]);
     timersRef.current = [
-      setTimeout(() => setSteps(s => [...s, { label: '摇光正在检索知识星图', time: nowStr() }]), 520),
+      setTimeout(() => setSteps(s => [...s, { label: '摇光正在检索记忆库', time: nowStr() }]), 520),
       setTimeout(() => setSteps(s => [...s, { label: '摇光正在推演最优解', time: nowStr() }]), 1250),
     ];
     return () => timersRef.current.forEach(clearTimeout);
