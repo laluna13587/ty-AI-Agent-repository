@@ -97,7 +97,7 @@ export default function LoginPage() {
               lineHeight: 2,
             }}>
               您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-              欢迎主公重返战场<br />天弈AI战场支援--「摇光」为您待命
+              欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
             </p>
           </div>
         </div>
@@ -111,7 +111,7 @@ export default function LoginPage() {
               最后一步
             </h2>
             <p className="mb-6 text-center text-sm" style={{ color: '#60a0c8' }}>
-              请输入您不带天弈前缀的游戏名或常用名字
+              请输入您的游戏名（无需扶摇前缀）或惯用称呼，此名称将作为摇光对您的专属称谓
             </p>
             <form onSubmit={handleGameNameSubmit} className="space-y-4">
               <input
@@ -137,7 +137,7 @@ export default function LoginPage() {
       <div className="w-full max-w-sm rounded-2xl p-8" style={{ background: 'rgba(10,20,40,0.95)', border: '1px solid rgba(100,200,255,0.2)', boxShadow: '0 0 40px rgba(80,180,255,0.15)' }}>
         <h1 className="mb-2 text-center" style={{ fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif', fontSize: '1.25rem', fontWeight: 700, background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 50%, #38b2ff 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', textShadow: 'none', letterSpacing: '0.05em' }}>
           {mode === 'login' ? (
-            <>欢迎加入天弈团<br />我是天弈AI助手--「摇光」</>
+            <>欢迎加入扶摇团<br />我是扶摇AI助手--「摇光」</>
           ) : <span style={{ WebkitTextFillColor: '#a8d8ff' }}>注册账号</span>}
         </h1>
         {mode === 'login' && (
@@ -154,12 +154,16 @@ export default function LoginPage() {
               style={{ background: 'rgba(20,40,70,0.8)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
               value={username}
               onChange={(e) => setUsername(e.target.value)}
+              placeholder={mode === 'register' ? '请填写您的微信号，将作为您在系统中的唯一身份标识' : ''}
               autoComplete="username"
               required
             />
           </div>
           <div>
             <label className="mb-1 block text-sm" style={{ color: '#60a0c8' }}>通行密钥</label>
+            {mode === 'register' && (
+              <p className="mb-1 text-xs" style={{ color: '#4a7a9b' }}>请设置您的登录密码，密码仅用于身份验证，如需修改可联系管理员</p>
+            )}
             <input
               type="password"
               className="w-full rounded-lg px-3 py-2 text-sm outline-none"
@@ -211,7 +215,7 @@ export default function LoginPage() {
               注册后需管理员审批方可使用
             </p>
             <p className="mt-2 text-center text-xs" style={{ color: '#e08060' }}>
-              成员身份标识必须与微信号完全一致，否则不予通过
+              请确保身份标识与您的微信号完全一致，否则审核将不予通过
             </p>
           </>
         )}

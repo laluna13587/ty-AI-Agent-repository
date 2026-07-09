@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "天弈团AI战场支援--「摇光」",
-  description: "天弈团专属AI助手",
+  title: "扶摇团AI战场支援--「摇光」",
+  description: "扶摇团专属AI助手",
 };
 
 export default function RootLayout({

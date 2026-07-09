@@ -76,7 +76,7 @@ export default function Page() {
             textAlign: 'center',
           }}>
             您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-            欢迎主公重返战场<br />天弈AI战场支援--「摇光」为您待命
+            欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
           </p>
         ) : (
           <span className="text-sm text-gray-400">加载中……</span>
