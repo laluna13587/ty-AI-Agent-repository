@@ -151,6 +151,20 @@ function Chat({
           <button
             className="rounded-lg px-3 py-1 text-xs"
             style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
+            onClick={() => {
+              const newId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+                const r = Math.random() * 16 | 0;
+                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+              });
+              localStorage.setItem('conversationId', newId);
+              window.location.reload();
+            }}
+          >
+            新对话
+          </button>
+          <button
+            className="rounded-lg px-3 py-1 text-xs"
+            style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' });
               router.replace('/login');
