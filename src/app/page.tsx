@@ -102,7 +102,7 @@ function ConvHistory({ currentId }: { currentId: string }) {
     <div style={{ position: 'relative' }}>
       <div className="flex gap-1">
         <button
-          className="rounded-lg px-3 py-1 text-xs"
+          className="btn-action btn-ghost rounded-lg px-3 py-1 text-xs"
           style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
           onClick={startNew}
         >
@@ -110,7 +110,7 @@ function ConvHistory({ currentId }: { currentId: string }) {
         </button>
         {list.length > 0 && (
           <button
-            className="rounded-lg px-2 py-1 text-xs"
+            className="btn-action btn-ghost rounded-lg px-2 py-1 text-xs"
             style={{ border: '1px solid rgba(80,180,255,0.2)', color: '#406070' }}
             onClick={() => setOpen(o => !o)}
             title="历史对话"
@@ -156,6 +156,7 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
   const bjDate = new Date().toLocaleDateString('zh-CN', {
     timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long',
   });
+  const lastMsg = typeof window !== 'undefined' ? localStorage.getItem('lastMessageSummary') : null;
 
   let timeLabel: string, message: string;
   if (hour >= 5 && hour < 9) {
@@ -183,7 +184,9 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
 
   return (
     <div className="flex flex-col items-center justify-center h-full gap-5 px-4 text-center">
-      <div style={{ fontSize: '0.68rem', color: '#1e3040', fontFamily: 'monospace', letterSpacing: '0.18em' }}>
+      <div style={{ fontSize: '0.68rem', color: '#3a2800', fontFamily: 'monospace', letterSpacing: '0.18em',
+        background: 'linear-gradient(90deg, #8a6820, #c8a040, #8a6820)',
+        WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>
         YAOGUANG · COMBAT SUPPORT SYSTEM · ONLINE
       </div>
       <div style={{
@@ -196,6 +199,11 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
         {bjDate}<br />
         {message}
       </div>
+      {lastMsg && (
+        <div style={{ fontSize: '0.7rem', color: '#4a5860', fontFamily: 'monospace', letterSpacing: '0.05em' }}>
+          上次通讯停留在「{lastMsg}」
+        </div>
+      )}
       <div style={{ fontSize: '0.68rem', color: '#1e3848', fontFamily: 'monospace', letterSpacing: '0.12em' }}>
         ▸ 请下达指令
       </div>
@@ -240,22 +248,39 @@ export default function Page() {
           setTimeout(() => { setShowWelcome(false); setWelcomeDone(true); }, 4000);
         }
 
-        // 每个浏览器一个会话 id，存在 localStorage，刷新后不变
+        // 每日首次登录自动开启新对话
+        const today = new Date().toLocaleDateString('zh-CN', { timeZone: 'Asia/Shanghai' });
+        const lastDate = localStorage.getItem('lastActiveDate');
         let id = localStorage.getItem('conversationId');
         if (!id) {
-          id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-            const r = Math.random() * 16 | 0;
-            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-          });
+          id = newConvId();
+          localStorage.setItem('conversationId', id);
+        } else if (lastDate && lastDate !== today) {
+          // 新的一天：把旧对话存入历史，开启新会话
+          const prevList = (() => { try { return JSON.parse(localStorage.getItem('conversationList') || '[]'); } catch { return []; } })();
+          const filtered = prevList.filter((c: { id: string }) => c.id !== id);
+          localStorage.setItem('conversationList', JSON.stringify([{ id, time: lastDate }, ...filtered].slice(0, 10)));
+          id = newConvId();
           localStorage.setItem('conversationId', id);
         }
+        localStorage.setItem('lastActiveDate', today);
         setConversationId(id);
 
         // 拉取这条会话的历史消息（5秒超时兜底）
         const historyTimeout = setTimeout(() => setInitialMessages([]), 5000);
         fetch(`/api/history?conversationId=${id}`)
           .then((r) => r.json())
-          .then((d) => { clearTimeout(historyTimeout); setInitialMessages(d.messages ?? []); })
+          .then((d) => {
+            clearTimeout(historyTimeout);
+            const msgs: UIMessage[] = d.messages ?? [];
+            // 存储最后一条消息摘要，供下次新对话"上次通讯"展示
+            const last = [...msgs].reverse().find(m => m.role === 'assistant' || m.role === 'user');
+            if (last) {
+              const text = (last.parts ?? []).map((p: { type: string; text?: string }) => p.type === 'text' ? p.text ?? '' : '').join('').trim();
+              if (text) localStorage.setItem('lastMessageSummary', text.slice(0, 15));
+            }
+            setInitialMessages(msgs);
+          })
           .catch(() => { clearTimeout(historyTimeout); setInitialMessages([]); });
       });
   }, [router]);
@@ -276,7 +301,7 @@ export default function Page() {
             textAlign: 'center',
           }}>
             您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-            欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
+            欢迎回来，【{welcomeName}】。
           </p>
         ) : (
           <span className="text-sm text-gray-400">加载中……</span>
@@ -341,7 +366,7 @@ function Chat({
           fontFamily: '"STKaiti", "KaiTi", "华文楷体", serif',
           fontSize: '1.3rem',
           fontWeight: 700,
-          background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 40%, #c8a8ff 80%, #a8d8ff 100%)',
+          background: 'linear-gradient(135deg, #a8d8ff 0%, #60c8ff 30%, #c8a840 60%, #e8c860 80%, #a8d8ff 100%)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
           letterSpacing: '0.1em',
@@ -354,7 +379,7 @@ function Chat({
           </div>
           <ConvHistory currentId={conversationId} />
           <button
-            className="rounded-lg px-3 py-1 text-xs"
+            className="btn-action rounded-lg px-3 py-1 text-xs"
             style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
             onClick={async () => {
               await fetch('/api/auth/logout', { method: 'POST' });

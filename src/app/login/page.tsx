@@ -114,8 +114,7 @@ export default function LoginPage() {
               letterSpacing: '0.08em',
               lineHeight: 2,
             }}>
-              您好，「{welcomeName}」。现在是北京时间：{welcomeTime}<br />
-              欢迎主公重返战场<br />扶摇AI战场支援--「摇光」为您待命
+              欢迎回来，【{welcomeName}】。
             </p>
           </div>
         </div>

@@ -53,3 +53,29 @@ body {
   animation: fadeInUp 0.35s ease both;
 }
 
+.btn-action {
+  transition: transform 0.12s ease, opacity 0.12s ease, box-shadow 0.12s ease;
+  cursor: pointer;
+}
+.btn-action:active {
+  transform: scale(0.92);
+  opacity: 0.75;
+}
+.btn-action:hover {
+  box-shadow: 0 0 8px rgba(80,180,255,0.3);
+}
+
+.btn-ghost {
+  transition: color 0.15s, border-color 0.15s, background 0.15s, transform 0.1s, box-shadow 0.15s;
+}
+.btn-ghost:hover {
+  color: #a8e0ff !important;
+  border-color: rgba(80,180,255,0.6) !important;
+  box-shadow: 0 0 10px rgba(80,180,255,0.25);
+}
+.btn-ghost:active {
+  transform: scale(0.94);
+  background: rgba(80,180,255,0.12) !important;
+  box-shadow: 0 0 16px rgba(80,180,255,0.4);
+}
+
