@@ -43,15 +43,17 @@ export async function POST(req: Request) {
     // 限流：每用户每天最多 10 条用户消息
     const todayStart = new Date();
     todayStart.setHours(0, 0, 0, 0);
+    const { data: userConvs } = await supabaseAdmin
+      .from('conversations')
+      .select('id')
+      .eq('user_id', user.id);
+    const convIds = (userConvs ?? []).map((c: { id: string }) => c.id);
     const { count: todayCount } = await supabaseAdmin
       .from('messages')
       .select('id', { count: 'exact', head: true })
       .eq('role', 'user')
       .gte('created_at', todayStart.toISOString())
-      .in(
-        'conversation_id',
-        supabaseAdmin.from('conversations').select('id').eq('user_id', user.id),
-      );
+      .in('conversation_id', convIds.length > 0 ? convIds : ['']);
     if ((todayCount ?? 0) >= 10) {
       return Response.json({ error: '今日提问次数已达上限（10次），请明天再来' }, { status: 429 });
     }
