@@ -226,7 +226,7 @@ export default function LoginPage() {
             className="w-full rounded-lg py-2 text-sm font-medium disabled:opacity-40"
             style={{ background: 'linear-gradient(135deg, #1a6090, #0a4070)', color: '#a8d8ff', border: '1px solid rgba(80,180,255,0.4)' }}
           >
-            {loading ? '处理中…' : mode === 'login' ? '登录' : '注册'}
+            {loading ? '核验中…' : mode === 'login' ? '接入' : '注册'}
           </button>
         </form>
 

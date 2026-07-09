@@ -24,7 +24,7 @@ export async function POST(req: Request) {
   // 认证检查：未登录直接拒绝
   const user = await getCurrentUser();
   if (!user) {
-    return Response.json({ error: '请先登录' }, { status: 401 });
+    return Response.json({ error: '身份未认证，请先接入系统' }, { status: 401 });
   }
 
   const { messages, conversationId }: {
@@ -55,7 +55,7 @@ export async function POST(req: Request) {
       .gte('created_at', todayStart.toISOString())
       .in('conversation_id', convIds.length > 0 ? convIds : ['']);
     if ((todayCount ?? 0) >= 10) {
-      return Response.json({ error: '今日提问次数已达上限（10次），请明天再来' }, { status: 429 });
+      return Response.json({ error: '今日通讯配额已耗尽（10次），请明日再度连线' }, { status: 429 });
     }
   }
 
@@ -69,7 +69,7 @@ export async function POST(req: Request) {
   const question = (lastUser?.role === 'user' ? textOf(lastUser) : '').trim();
   console.log(`[chat] user=${user.username} question="${question.slice(0, 50)}"`);
   if (!question) {
-    return Response.json({ error: '消息不能为空' }, { status: 400 });
+    return Response.json({ error: '指令内容不得为空' }, { status: 400 });
   }
   await supabaseAdmin.from('messages').insert({
     conversation_id: conversationId,

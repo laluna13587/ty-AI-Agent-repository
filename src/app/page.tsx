@@ -313,7 +313,7 @@ export default function Page() {
             </p>
           </div>
         ) : (
-          <span className="text-sm text-gray-400">加载中……</span>
+          <span className="text-sm" style={{ color: '#2a4858', fontFamily: 'monospace', letterSpacing: '0.1em' }}>摇光系统接入中……</span>
         )}
       </div>
     );
@@ -438,7 +438,7 @@ function Chat({
           className="flex-1 rounded-lg px-4 py-2 text-sm outline-none"
           style={{ background: 'rgba(10,25,50,0.9)', border: '1px solid rgba(80,180,255,0.3)', color: '#c8e8ff' }}
           value={input}
-          placeholder="输入消息，回车发送"
+          placeholder="向摇光下达指令……"
           onChange={(e) => setInput(e.target.value)}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}

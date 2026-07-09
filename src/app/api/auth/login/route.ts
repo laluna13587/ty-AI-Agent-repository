@@ -6,7 +6,7 @@ export async function POST(req: Request) {
   const { username, password } = await req.json();
 
   if (!username || !password) {
-    return Response.json({ error: '用户名和密码不能为空' }, { status: 400 });
+    return Response.json({ error: '身份标识与通行密钥不得为空' }, { status: 400 });
   }
 
   const { data: user } = await supabaseAdmin
@@ -16,16 +16,16 @@ export async function POST(req: Request) {
     .maybeSingle();
 
   if (!user) {
-    return Response.json({ error: '用户名或密码错误' }, { status: 401 });
+    return Response.json({ error: '身份核验失败，请检查输入信息' }, { status: 401 });
   }
 
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) {
-    return Response.json({ error: '用户名或密码错误' }, { status: 401 });
+    return Response.json({ error: '身份核验失败，请检查输入信息' }, { status: 401 });
   }
 
   if (!user.is_approved) {
-    return Response.json({ error: '账户尚未获得授权，请联系管理员' }, { status: 403 });
+    return Response.json({ error: '此账户尚未获得访问授权，请联系管理员-望月' }, { status: 403 });
   }
 
   const token = signToken({ id: user.id, username: user.username });

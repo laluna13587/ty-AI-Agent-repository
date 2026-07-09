@@ -4,7 +4,7 @@ import { supabaseAdmin } from '@/lib/supabase';
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
-    return Response.json({ error: '未登录' }, { status: 401 });
+    return Response.json({ error: '身份信息缺失，请重新接入' }, { status: 401 });
   }
   const { data } = await supabaseAdmin
     .from('users')
