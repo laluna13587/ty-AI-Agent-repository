@@ -18,10 +18,12 @@ function ProcessSteps({ status }: { status: string }) {
 
   useEffect(() => {
     if (status === 'idle' || status === 'error') {
-      initialized.current = false;
-      timersRef.current.forEach(clearTimeout);
-      timersRef.current = [];
-      return;
+      const t = setTimeout(() => {
+        setSteps([]);
+        initialized.current = false;
+      }, 600);
+      timersRef.current.push(t);
+      return () => clearTimeout(t);
     }
     if (initialized.current) return;
     initialized.current = true;
@@ -57,8 +59,99 @@ function ProcessSteps({ status }: { status: string }) {
   );
 }
 
+// ── 对话历史切换组件 ──────────────────────────────────────
+function newConvId() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+}
+
+function ConvHistory({ currentId }: { currentId: string }) {
+  const [open, setOpen] = useState(false);
+  const [list, setList] = useState<{ id: string; time: string }[]>([]);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('conversationList');
+      setList(raw ? JSON.parse(raw) : []);
+    } catch { setList([]); }
+  }, []);
+
+  function switchTo(id: string) {
+    localStorage.setItem('conversationId', id);
+    sessionStorage.setItem('justLoggedIn', '1'); // 跳过欢迎语
+    window.location.reload();
+  }
+
+  function startNew() {
+    // 把当前会话存入历史
+    const time = new Date().toLocaleString('zh-CN', {
+      timeZone: 'Asia/Shanghai', month: 'numeric', day: 'numeric',
+      hour: '2-digit', minute: '2-digit', hour12: false,
+    });
+    const prev = list.filter(c => c.id !== currentId);
+    const updated = [{ id: currentId, time }, ...prev].slice(0, 10);
+    localStorage.setItem('conversationList', JSON.stringify(updated));
+    sessionStorage.setItem('justLoggedIn', '1'); // 跳过欢迎语
+    localStorage.setItem('conversationId', newConvId());
+    window.location.reload();
+  }
+
+  return (
+    <div style={{ position: 'relative' }}>
+      <div className="flex gap-1">
+        <button
+          className="rounded-lg px-3 py-1 text-xs"
+          style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
+          onClick={startNew}
+        >
+          新对话
+        </button>
+        {list.length > 0 && (
+          <button
+            className="rounded-lg px-2 py-1 text-xs"
+            style={{ border: '1px solid rgba(80,180,255,0.2)', color: '#406070' }}
+            onClick={() => setOpen(o => !o)}
+            title="历史对话"
+          >
+            ▾
+          </button>
+        )}
+      </div>
+      {open && (
+        <div
+          style={{
+            position: 'absolute', right: 0, top: '110%', zIndex: 50,
+            background: 'rgba(5,15,30,0.97)', border: '1px solid rgba(80,180,255,0.2)',
+            borderRadius: '0.5rem', minWidth: '160px', padding: '4px 0',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.6)',
+          }}
+        >
+          {list.map((c) => (
+            <button
+              key={c.id}
+              onClick={() => { setOpen(false); switchTo(c.id); }}
+              style={{
+                display: 'block', width: '100%', textAlign: 'left',
+                padding: '6px 12px', fontSize: '0.72rem', fontFamily: 'monospace',
+                color: c.id === currentId ? '#60c8ff' : '#406878',
+                background: 'transparent', border: 'none', cursor: 'pointer',
+              }}
+              onMouseEnter={e => (e.currentTarget.style.color = '#80d8ff')}
+              onMouseLeave={e => (e.currentTarget.style.color = c.id === currentId ? '#60c8ff' : '#406878')}
+            >
+              {c.time}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── 空状态问候组件 ─────────────────────────────────────────
-function EmptyGreeting({ username }: { username: string }) {
+function EmptyGreeting({ gameName }: { gameName: string }) {
   const hour = new Date().getHours();
   const bjDate = new Date().toLocaleDateString('zh-CN', {
     timeZone: 'Asia/Shanghai', month: 'long', day: 'numeric', weekday: 'long',
@@ -99,7 +192,7 @@ function EmptyGreeting({ username }: { username: string }) {
         background: 'linear-gradient(135deg, #7ab8d8 0%, #50a8c8 50%, #88c8b8 100%)',
         WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
       }}>
-        {timeLabel}，「{username}」<br />
+        {timeLabel}，「{gameName}」<br />
         {bjDate}<br />
         {message}
       </div>
@@ -118,6 +211,7 @@ export default function Page() {
     null,
   );
   const [username, setUsername] = useState<string | null>(null);
+  const [gameName, setGameName] = useState<string | null>(null);
   const [showWelcome, setShowWelcome] = useState(false);
   const [welcomeDone, setWelcomeDone] = useState(true); // 默认 true，不需要等待
   const [welcomeName, setWelcomeName] = useState('');
@@ -133,6 +227,7 @@ export default function Page() {
       .then((d) => {
         if (!d) return;
         setUsername(d.username);
+        setGameName(d.gameName ?? d.username);
         // 刚从登录页跳转过来，跳过欢迎弹窗（登录页已经弹过了）
         if (sessionStorage.getItem('justLoggedIn')) {
           sessionStorage.removeItem('justLoggedIn');
@@ -191,7 +286,7 @@ export default function Page() {
   }
 
   return (
-    <Chat conversationId={conversationId} initialMessages={initialMessages} username={username ?? ''} />
+    <Chat conversationId={conversationId} initialMessages={initialMessages} username={username ?? ''} gameName={gameName ?? username ?? ''} />
   );
 }
 
@@ -199,10 +294,12 @@ function Chat({
   conversationId,
   initialMessages,
   username,
+  gameName,
 }: {
   conversationId: string;
   initialMessages: UIMessage[];
   username: string;
+  gameName: string;
 }) {
   const router = useRouter();
   const [input, setInput] = useState('');
@@ -251,21 +348,11 @@ function Chat({
           textShadow: 'none',
         }}>✦ 摇光 ✦</h1>
         <div className="flex items-center gap-3 text-sm" style={{ color: '#406080' }}>
-          <span style={{ color: '#60a0c8' }}>{username}</span>
-          <button
-            className="rounded-lg px-3 py-1 text-xs"
-            style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
-            onClick={() => {
-              const newId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-                const r = Math.random() * 16 | 0;
-                return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-              });
-              localStorage.setItem('conversationId', newId);
-              window.location.reload();
-            }}
-          >
-            新对话
-          </button>
+          <div className="text-right" style={{ lineHeight: 1.5 }}>
+            <div style={{ fontSize: '0.6rem', color: '#2a5070', fontFamily: 'monospace', letterSpacing: '0.08em' }}>已认证身份</div>
+            <div style={{ fontSize: '0.82rem', color: '#60a0c8', fontFamily: '"STKaiti", "KaiTi", serif' }}>【{gameName}】</div>
+          </div>
+          <ConvHistory currentId={conversationId} />
           <button
             className="rounded-lg px-3 py-1 text-xs"
             style={{ border: '1px solid rgba(80,180,255,0.3)', color: '#60a0c8' }}
@@ -281,7 +368,7 @@ function Chat({
 
       {/* 消息列表 */}
       <div className="breathe-border flex-1 space-y-4 overflow-y-auto rounded-lg p-4" style={{ border: '1px solid rgba(80,180,255,0.15)', background: 'rgba(5,10,25,0.8)' }}>
-        {messages.length === 0 && !isBusy && <EmptyGreeting username={username} />}
+        {messages.length === 0 && !isBusy && <EmptyGreeting gameName={gameName} />}
 
         {messages.map((message) => (
           <div

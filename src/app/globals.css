@@ -26,8 +26,8 @@ body {
 }
 
 @keyframes breathe {
-  0%, 100% { box-shadow: 0 0 8px rgba(80,180,255,0.08), inset 0 0 8px rgba(80,180,255,0.02); border-color: rgba(80,180,255,0.12); }
-  50%       { box-shadow: 0 0 22px rgba(80,180,255,0.22), inset 0 0 12px rgba(80,180,255,0.06); border-color: rgba(80,180,255,0.28); }
+  0%, 100% { box-shadow: 0 0 10px rgba(80,180,255,0.15), 0 0 30px rgba(80,180,255,0.05), inset 0 0 10px rgba(80,180,255,0.04); border-color: rgba(80,180,255,0.18); }
+  50%       { box-shadow: 0 0 28px rgba(80,180,255,0.45), 0 0 60px rgba(80,180,255,0.18), inset 0 0 20px rgba(80,180,255,0.10); border-color: rgba(80,180,255,0.55); }
 }
 
 @keyframes fadeInUp {
