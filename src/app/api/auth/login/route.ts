@@ -21,7 +21,7 @@ export async function POST(req: Request) {
 
   const valid = await bcrypt.compare(password, user.password_hash);
   if (!valid) {
-    return Response.json({ error: '身份核验失败，请检查输入信息' }, { status: 401 });
+    return Response.json({ error: '密码错误，请检查输入信息' }, { status: 401 });
   }
 
   if (!user.is_approved) {
