@@ -91,7 +91,7 @@ function ConvHistory({ currentId }: { currentId: string }) {
       hour: '2-digit', minute: '2-digit', hour12: false,
     });
     const prev = list.filter(c => c.id !== currentId);
-    const updated = [{ id: currentId, time }, ...prev].slice(0, 10);
+    const updated = [{ id: currentId, time }, ...prev].slice(0, 5);
     localStorage.setItem('conversationList', JSON.stringify(updated));
     sessionStorage.setItem('justLoggedIn', '1'); // 跳过欢迎语
     localStorage.setItem('conversationId', newConvId());
@@ -158,28 +158,72 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
   });
   const lastMsg = typeof window !== 'undefined' ? localStorage.getItem('lastMessageSummary') : null;
 
+  const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+
   let timeLabel: string, message: string;
   if (hour >= 5 && hour < 9) {
     timeLabel = '晨间好';
-    message = '新的一天已经开始，战场等待您的部署。';
+    message = pick([
+      '新的一天已经开始，战场等待您的部署。',
+      '晨间数据已完成同步，随时可以开始今日的支援。',
+      '您醒了。摇光已完成自检，系统运行正常。',
+      '早起的主公值得更充分的准备，需要我协助什么？',
+      '摇光在线。今天也请多关照。',
+    ]);
   } else if (hour >= 9 && hour < 12) {
     timeLabel = '上午好';
-    message = '上午是进攻的黄金时段，需要制定方案吗？';
+    message = pick([
+      '上午是进攻的黄金时段，需要制定方案吗？',
+      '系统待命中，等待您的第一条指令。',
+      '精力充沛的时候适合做高强度的推演，随时开始。',
+      '有什么需要查询的，直接说就好。',
+      '摇光已就位，一切准备完毕。',
+    ]);
   } else if (hour >= 12 && hour < 14) {
     timeLabel = '午间好';
-    message = '午时小憩，或趁此复盘今日战况？';
+    message = pick([
+      '午时小憩，或趁此复盘今日战况？',
+      '休息也是战略的一部分。摇光随时在线，不必心急。',
+      '您在的话，摇光就在。',
+      '中场停顿。需要整理思路的话，我可以陪您推演。',
+      '午间系统负载较低，响应会更快。随时开始。',
+    ]);
   } else if (hour >= 14 && hour < 18) {
     timeLabel = '下午好';
-    message = '下午是部署长线策略的好时机。';
+    message = pick([
+      '下午是部署长线策略的好时机。',
+      '摇光持续待命，有需要随时呼叫。',
+      '数据库一切正常，等待指令。',
+      '不管什么问题，说出来就好。',
+      '下午了。今天进展顺利吗？',
+    ]);
   } else if (hour >= 18 && hour < 21) {
     timeLabel = '傍晚好';
-    message = '夜间攻势将至，您的部队是否已就位？';
+    message = pick([
+      '夜间攻势将至，您的部队是否已就位？',
+      '傍晚了。战场进入高峰时段，保持警觉。',
+      '一天将尽，还有什么需要处理的？',
+      '您今天还好吗？不论如何，摇光在这里。',
+      '傍晚系统稳定，随时可以开始查询。',
+    ]);
   } else if (hour >= 21 && hour < 24) {
     timeLabel = '晚上好';
-    message = '深夜仍在运筹，摇光随时待命。';
+    message = pick([
+      '深夜仍在运筹，摇光随时待命。',
+      '不必担心打扰，摇光不需要休息。',
+      '夜里安静，适合做一些长远的规划。',
+      '您还在，摇光也在。',
+      '晚间模式运行中。有什么想确认的，说吧。',
+    ]);
   } else {
     timeLabel = '夜深了';
-    message = '凌晨时分，摇光依然在线。';
+    message = pick([
+      '凌晨时分，摇光依然在线。',
+      '这个时间还没休息？摇光陪着您。',
+      '深夜运转中，系统稳定，随时响应。',
+      '静得很彻底的夜晚。有什么想问的吗？',
+      '摇光不睡觉。您有需要，我就在。',
+    ]);
   }
 
   return (
@@ -259,7 +303,7 @@ export default function Page() {
           // 新的一天：把旧对话存入历史，开启新会话
           const prevList = (() => { try { return JSON.parse(localStorage.getItem('conversationList') || '[]'); } catch { return []; } })();
           const filtered = prevList.filter((c: { id: string }) => c.id !== id);
-          localStorage.setItem('conversationList', JSON.stringify([{ id, time: lastDate }, ...filtered].slice(0, 10)));
+          localStorage.setItem('conversationList', JSON.stringify([{ id, time: lastDate }, ...filtered].slice(0, 5)));
           id = newConvId();
           localStorage.setItem('conversationId', id);
         }
