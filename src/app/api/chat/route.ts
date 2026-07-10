@@ -54,8 +54,8 @@ export async function POST(req: Request) {
       .eq('role', 'user')
       .gte('created_at', todayStart.toISOString())
       .in('conversation_id', convIds.length > 0 ? convIds : ['']);
-    if ((todayCount ?? 0) >= 10) {
-      return Response.json({ error: '今日通讯配额已耗尽（10次），请明日再度连线' }, { status: 429 });
+    if ((todayCount ?? 0) >= 20) {
+      return Response.json({ error: '今日通讯配额已耗尽（20次），请明日再度连线' }, { status: 429 });
     }
   }
 
