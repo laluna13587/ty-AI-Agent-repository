@@ -95,6 +95,7 @@ function ConvHistory({ currentId }: { currentId: string }) {
     localStorage.setItem('conversationList', JSON.stringify(updated));
     sessionStorage.setItem('justLoggedIn', '1'); // 跳过欢迎语
     localStorage.setItem('conversationId', newConvId());
+    localStorage.setItem('greetingSeed', String(Math.floor(Math.random() * 5)));
     window.location.reload();
   }
 
@@ -158,7 +159,11 @@ function EmptyGreeting({ gameName }: { gameName: string }) {
   });
   const lastMsg = typeof window !== 'undefined' ? localStorage.getItem('lastMessageSummary') : null;
 
-  const pick = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)];
+  // 读取会话种子，保证同一会话内状态词固定不变
+  const seed = typeof window !== 'undefined'
+    ? parseInt(localStorage.getItem('greetingSeed') ?? '0', 10)
+    : 0;
+  const pick = (arr: string[]) => arr[seed % arr.length];
 
   let timeLabel: string, message: string;
   if (hour >= 5 && hour < 9) {
@@ -299,6 +304,7 @@ export default function Page() {
         if (!id) {
           id = newConvId();
           localStorage.setItem('conversationId', id);
+          localStorage.setItem('greetingSeed', String(Math.floor(Math.random() * 5)));
         } else if (lastDate && lastDate !== today) {
           // 新的一天：把旧对话存入历史，开启新会话
           const prevList = (() => { try { return JSON.parse(localStorage.getItem('conversationList') || '[]'); } catch { return []; } })();
@@ -306,6 +312,7 @@ export default function Page() {
           localStorage.setItem('conversationList', JSON.stringify([{ id, time: lastDate }, ...filtered].slice(0, 5)));
           id = newConvId();
           localStorage.setItem('conversationId', id);
+          localStorage.setItem('greetingSeed', String(Math.floor(Math.random() * 5)));
         }
         localStorage.setItem('lastActiveDate', today);
         setConversationId(id);
